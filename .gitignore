@@ -1,0 +1,6 @@
+.DS_Store
+*Alldims.npy
+*coarsen.pkl
+*.png
+__pycache__/
+.ipynb_checkpoints/
