@@ -1,6 +1,7 @@
 .DS_Store
 *Alldims.npy
 *coarsen.pkl
-*.png
+*All_grid.pkl
+thermals_all.zip
 __pycache__/
 .ipynb_checkpoints/
