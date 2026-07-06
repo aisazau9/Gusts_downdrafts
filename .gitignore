@@ -1,4 +1,5 @@
 .DS_Store
+*originalgrid.npy
 *Alldims.npy
 *coarsen.pkl
 *All_grid.pkl

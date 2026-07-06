@@ -1,5 +1,4 @@
 import sys
-import sys
 import glob
 import numpy as np
 import xarray as xr
@@ -22,8 +21,7 @@ import wrf
 
 path_arrays = "/g/data/up6/ai2733/Gusts_downdrafts/data/arrays/"
 
-case_idx = int(sys.argv[1]) # From 0 to 2
-case     = ["CASE1", "CASE2_new", "CASE3_new"][case_idx]
+case     = "CASE2_new_testmp"
 
 def latlon_dist(lat, lon, lats, lons):
 
@@ -46,24 +44,13 @@ def latlon_dist(lat, lon, lats, lons):
     return (R * c)
 
 # General info
-date_cases    = {"CASE1": ("2015-12-15", "2015-12-16"), 
-                 "CASE2_new": ("2009-01-19","2009-01-20"), 
-                 "CASE3_new": ("2017-02-16","2017-02-17")}
-lat_lon_cases = {"CASE1": (-29.49, 149.85), 
-                "CASE2_new": (-35.16, 147.46), 
-                 "CASE3_new": (-31.07,150.84) }
-station_cases = {"CASE1": "053115", 
-                 "CASE2_new": "072150", 
-                 "CASE3_new": "055325"}
-name_cases    = {"CASE1": "Moree Aero",
-                 "CASE2_new": "Wagga Wagga", 
-                 "CASE3_new": "Tamworth Airport"}
+lat_lon_cases = {"CASE2_new_testmp": (-35.16, 147.46)}
 
 
 def save_arrays(case, var, hows = ["All"]):
     
     domains = ["d02", "d03"]
-    path_wrf = f"/g/data/w28/ai2733/outputs_{case}/"
+    path_wrf = f"/scratch/up6/ai2733/outputs_{case}/"
     
     wrflist = {}
     for dom in domains: wrflist[dom] = [nc.Dataset(f) for f in np.sort(glob.glob(f"{path_wrf}wrfout_{dom}_*"))]
@@ -80,15 +67,10 @@ def save_arrays(case, var, hows = ["All"]):
             print (len(list_files), "files in total, last date not found ")
         return (int(idx_ti), int(idx_tf))
     
-    dates_filter_cases = {"CASE1":{"d01":("2015-12-16_00:00:00", "2015-12-16_12:00:00"),
-                                  "d02":("2015-12-16_00:05:00", "2015-12-16_11:35:00"),
-                                  "d03":("2015-12-16_00:05:00", "2015-12-16_11:35:00")},
-                         "CASE2_new":{"d01":("2009-01-20_00:00:00", "2009-01-20_12:00:00"),
-                                  "d02":("2009-01-20_00:05:00", "2009-01-20_12:05:00"),
-                                  "d03":("2009-01-20_00:05:00", "2009-01-20_12:05:00")},
-                         "CASE3_new":{"d01":("2017-02-17_00:00:00", "2017-02-17_12:00:00"),
-                                  "d02":("2017-02-17_00:05:00", "2017-02-17_12:35:00"),
-                                  "d03":("2017-02-17_00:05:00", "2017-02-17_12:35:00")}}
+    dates_filter_cases = {
+                         "CASE2_new_testmp":{"d01":("2009-01-20_00:00:00", "2009-01-20_12:00:00"),
+                                  "d02":("2009-01-20_00:00:00", "2009-01-20_12:05:00"),
+                                  "d03":("2009-01-20_00:00:00", "2009-01-20_12:05:00")}}
     
     idx_dom = {}
     for dom in domains:
@@ -173,6 +155,8 @@ def save_arrays(case, var, hows = ["All"]):
             aux_d03_coarsen = aux_d03_coarsen.isel(south_north = slice(1,161)) # I am making sure lat and lons are the same!
         if case == "CASE2_new":
             aux_d03_coarsen = aux_d03_coarsen.isel(south_north = slice(1,160), west_east = slice(1,160))
+        if case == "CASE2_new_testmp":
+            aux_d03_coarsen = aux_d03_coarsen.isel(south_north = slice(1,160), west_east = slice(1,160))
         if case == "CASE3_new":
             aux_d03_coarsen = aux_d03_coarsen.isel(west_east = slice(0, 160))
             
@@ -206,7 +190,7 @@ def save_arrays(case, var, hows = ["All"]):
         print (f"Arrays saved {how}")
 
 # Save max gust
-save_arrays(case, "WSPD10MAX", hows = ["All"])
+#save_arrays(case, "WSPD10MAX", hows = ["All"])
 
 # Reflectivity
 save_arrays(case, "REFD_MAX", hows = ["All"])
@@ -217,4 +201,3 @@ save_arrays(case, "RAINNC", hows = ["All"])
 # Hydrometeors
 for var_ in ["QRAIN", "QGRAUP"]: # "QCLOUD", "QICE", "QHAIL"]:
     save_arrays(case, var_, hows = ["sum"]) 
-
